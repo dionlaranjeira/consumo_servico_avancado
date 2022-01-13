@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import 'Post.dart';
+
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
 
@@ -11,56 +13,70 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  var _preco = "";
-  Future<Map> _obterPreco() async{
-    var url = "https://www.blockchain.com/ticker";
+  var _urlBase = "https://jsonplaceholder.typicode.com";
+
+  Future<List<Post>> _recuperarPostagens() async {
     HttpClient httpClient = new HttpClient();
-    HttpClientRequest request = await httpClient.getUrl(Uri.parse(url));
+    HttpClientRequest request =
+        await httpClient.getUrl(Uri.parse(_urlBase + "/posts"));
     HttpClientResponse response = await request.close();
     // todo - you should check the response.statusCode
     String reply = await response.transform(utf8.decoder).join();
     httpClient.close();
-    
-     Map<String, dynamic> respostaMap = json.decode(reply);
 
-     return respostaMap;
+    var respostaJson = json.decode(reply);
 
+    List<Post> postagens = [];
+    for (var post in respostaJson) {
+      Post p = Post(post["userId"], post["id"], post["title"], post["body"]);
+      postagens.add(p);
+    }
+
+    return postagens;
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map>(
-      future: _obterPreco(),
-      builder: (context, snapshot){
-        String resultado = "";
-        switch(snapshot.connectionState){
-          case ConnectionState.none:
-            resultado = "Conexão nome";
-            break;
-          case ConnectionState.waiting:
-            resultado = "Conexão waiting";
-            break;
-          case ConnectionState.active:
-            resultado = "Conexão active";
-            break;
-          case ConnectionState.done:
+    String resposta = "";
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Consumo de serviço avançado"),
+      ),
+      body: FutureBuilder<List<Post>>(
+        future: _recuperarPostagens(),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+              break;
+            case ConnectionState.waiting:
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+              break;
+            case ConnectionState.active:
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                resposta = "Erro ao carregar";
+              } else {
+                return ListView.builder(
+                    itemCount: snapshot.data?.length,
+                    itemBuilder: (context, index) {
+                      List<Post>? lista = snapshot.data;
+                      Post post = lista![index];
 
-
-            if(snapshot.hasError){
-              resultado = "Erro ao carregar os dados";
-            }
-            else{
-              double valor = snapshot.data!["BRL"]["buy"];
-              resultado = "Preço do bitcoin: ${valor.toString()}";
-            }
-
-            break;
-        }
-
-        return Center(
-          child: Text(resultado),
-        );
-      },
+                      return ListTile(
+                        title: Text(post.title),
+                        subtitle: Text(post.body),
+                      );
+                    });
+              }
+              break;
+          }
+          return Center(
+            child: Text(resposta),
+          );
+        },
+      ),
     );
   }
 }
