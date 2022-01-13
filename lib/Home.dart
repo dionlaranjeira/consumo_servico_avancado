@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   var _urlBase = "https://jsonplaceholder.typicode.com";
 
-  Future<List<Post>> _recuperarPostagens() async {
+  Future<List<Post>> _recuperarPostagensGET() async {
     HttpClient httpClient = new HttpClient();
     HttpClientRequest request =
         await httpClient.getUrl(Uri.parse(_urlBase + "/posts"));
@@ -35,6 +35,10 @@ class _HomeState extends State<Home> {
     return postagens;
   }
 
+  void _recuperarPostagensPOST(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     String resposta = "";
@@ -42,40 +46,65 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text("Consumo de serviço avançado"),
       ),
-      body: FutureBuilder<List<Post>>(
-        future: _recuperarPostagens(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-              break;
-            case ConnectionState.waiting:
-              return Center(
-                child: CircularProgressIndicator(),
-              );
-              break;
-            case ConnectionState.active:
-            case ConnectionState.done:
-              if (snapshot.hasError) {
-                resposta = "Erro ao carregar";
-              } else {
-                return ListView.builder(
-                    itemCount: snapshot.data?.length,
-                    itemBuilder: (context, index) {
-                      List<Post>? lista = snapshot.data;
-                      Post post = lista![index];
+      body: Container(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ElevatedButton(
+                    onPressed: _recuperarPostagensPOST,
+                    child: Text("SALVAR"),
+                ),
+                ElevatedButton(
+                  onPressed: _recuperarPostagensPOST,
+                  child: Text("ATUALIZAR"),
+                ),
+                ElevatedButton(
+                  onPressed: _recuperarPostagensPOST,
+                  child: Text("EXCLUIR"),
+                ),
+              ],
+            ),
 
-                      return ListTile(
-                        title: Text(post.title),
-                        subtitle: Text(post.body),
-                      );
-                    });
-              }
-              break;
-          }
-          return Center(
-            child: Text(resposta),
-          );
-        },
+           Expanded(child:  FutureBuilder<List<Post>>(
+             future: _recuperarPostagensGET(),
+             builder: (context, snapshot) {
+               switch (snapshot.connectionState) {
+                 case ConnectionState.none:
+                   break;
+                 case ConnectionState.waiting:
+                   return Center(
+                     child: CircularProgressIndicator(),
+                   );
+                   break;
+                 case ConnectionState.active:
+                 case ConnectionState.done:
+                   if (snapshot.hasError) {
+                     resposta = "Erro ao carregar";
+                   } else {
+                     return ListView.builder(
+                         itemCount: snapshot.data?.length,
+                         itemBuilder: (context, index) {
+                           List<Post>? lista = snapshot.data;
+                           Post post = lista![index];
+
+                           return ListTile(
+                             title: Text(post.title),
+                             subtitle: Text(post.body),
+                           );
+                         });
+                   }
+                   break;
+               }
+               return Center(
+                 child: Text(resposta),
+               );
+             },
+           ),),
+
+          ],
+        ),
       ),
     );
   }
