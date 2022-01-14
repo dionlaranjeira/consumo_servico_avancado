@@ -61,6 +61,24 @@ class _HomeState extends State<Home> {
     print("STATUS CODE " + statusCodes.toString());
   }
 
+  void _enviarPostagensPOST_BY_CLASS() async {
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.postUrl(Uri.parse(_urlBase+"/posts"));
+    request.headers.set('content-type', 'application/json');
+
+    Post post = new Post(1267, 1, "testando método post", "nova postagem adicionado ao servidor");
+
+    request.add(utf8.encode(json.encode(post.toJson())));
+    HttpClientResponse response = await request.close();
+
+    // todo - you should check the response.statusCode
+    String reply = await response.transform(utf8.decoder).join();
+    int statusCodes = await response.statusCode;
+    httpClient.close();
+    print("RESPOSTA!"+reply.toString());
+    print("STATUS CODE " + statusCodes.toString());
+  }
+
   void _atualizarPostagensPUT() async {
 
     HttpClient httpClient = new HttpClient();
@@ -137,11 +155,11 @@ class _HomeState extends State<Home> {
             Row(
               children: [
                 ElevatedButton(
-                    onPressed: _enviarPostagensPOST,
+                    onPressed: _enviarPostagensPOST_BY_CLASS,
                     child: Text("SALVAR"),
                 ),
                 ElevatedButton(
-                  onPressed: _atualizarPostagensPATCH,
+                  onPressed: _atualizarPostagensPUT,
                   child: Text("ATUALIZAR"),
                 ),
                 ElevatedButton(
