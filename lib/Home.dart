@@ -153,6 +153,7 @@ class _HomeState extends State<Home> {
         child: Column(
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
                     onPressed: _enviarPostagensPOST_BY_CLASS,
