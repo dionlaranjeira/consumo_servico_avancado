@@ -109,6 +109,19 @@ class _HomeState extends State<Home> {
 
   }
 
+  void _deletarPostagensDELETE() async {
+
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.deleteUrl(Uri.parse(_urlBase+"/posts/2"));
+    HttpClientResponse response = await request.close();
+    String reply = await response.transform(utf8.decoder).join();
+    int statusCodes = await response.statusCode;
+    httpClient.close();
+    print("RESPOSTA!"+reply.toString());
+    print("STATUS CODE " + statusCodes.toString());
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +145,7 @@ class _HomeState extends State<Home> {
                   child: Text("ATUALIZAR"),
                 ),
                 ElevatedButton(
-                  onPressed: (){},
+                  onPressed: _deletarPostagensDELETE,
                   child: Text("EXCLUIR"),
                 ),
               ],
