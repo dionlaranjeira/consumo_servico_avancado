@@ -35,8 +35,30 @@ class _HomeState extends State<Home> {
     return postagens;
   }
 
-  void _recuperarPostagensPOST(){
 
+
+
+  void _enviarPostagensPOST() async {
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.postUrl(Uri.parse(_urlBase+"/posts"));
+    request.headers.set('content-type', 'application/json');
+
+    var jsonMap = {
+      "userId":1267,
+      "id":null,
+      "title":"testando post",
+      "body":"novo post adicionado ao servidor"
+    };
+
+    request.add(utf8.encode(json.encode(jsonMap)));
+    HttpClientResponse response = await request.close();
+
+    // todo - you should check the response.statusCode
+    String reply = await response.transform(utf8.decoder).join();
+    int statusCodes = await response.statusCode;
+    httpClient.close();
+    print("RESPOSTA!"+reply.toString());
+    print("STATUS CODE " + statusCodes.toString());
   }
 
   @override
@@ -53,15 +75,15 @@ class _HomeState extends State<Home> {
             Row(
               children: [
                 ElevatedButton(
-                    onPressed: _recuperarPostagensPOST,
+                    onPressed: _enviarPostagensPOST,
                     child: Text("SALVAR"),
                 ),
                 ElevatedButton(
-                  onPressed: _recuperarPostagensPOST,
+                  onPressed: (){},
                   child: Text("ATUALIZAR"),
                 ),
                 ElevatedButton(
-                  onPressed: _recuperarPostagensPOST,
+                  onPressed: (){},
                   child: Text("EXCLUIR"),
                 ),
               ],
