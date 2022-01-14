@@ -46,8 +46,8 @@ class _HomeState extends State<Home> {
     var jsonMap = {
       "userId":1267,
       "id":null,
-      "title":"testando post",
-      "body":"novo post adicionado ao servidor"
+      "title":"testando método post",
+      "body":"nova postagem adicionado ao servidor"
     };
 
     request.add(utf8.encode(json.encode(jsonMap)));
@@ -60,6 +60,55 @@ class _HomeState extends State<Home> {
     print("RESPOSTA!"+reply.toString());
     print("STATUS CODE " + statusCodes.toString());
   }
+
+  void _atualizarPostagensPUT() async {
+
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.putUrl(Uri.parse(_urlBase+"/posts/2"));
+    request.headers.set('content-type', 'application/json');
+
+    var jsonMap = {
+      "userId":120,
+      "id":2,
+      "title":"testando método put",
+      "body":"atualizando postagem"
+    };
+
+    request.add(utf8.encode(json.encode(jsonMap)));
+    HttpClientResponse response = await request.close();
+
+    // todo - you should check the response.statusCode
+    String reply = await response.transform(utf8.decoder).join();
+    int statusCodes = await response.statusCode;
+    httpClient.close();
+    print("RESPOSTA!"+reply.toString());
+    print("STATUS CODE " + statusCodes.toString());
+
+  }
+
+  void _atualizarPostagensPATCH() async {
+
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.patchUrl(Uri.parse(_urlBase+"/posts/2"));
+    request.headers.set('content-type', 'application/json');
+
+    var jsonMap = {
+      "userId":120,
+      "body":"atualizando postagem"
+    };
+
+    request.add(utf8.encode(json.encode(jsonMap)));
+    HttpClientResponse response = await request.close();
+
+    // todo - you should check the response.statusCode
+    String reply = await response.transform(utf8.decoder).join();
+    int statusCodes = await response.statusCode;
+    httpClient.close();
+    print("RESPOSTA!"+reply.toString());
+    print("STATUS CODE " + statusCodes.toString());
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +128,7 @@ class _HomeState extends State<Home> {
                     child: Text("SALVAR"),
                 ),
                 ElevatedButton(
-                  onPressed: (){},
+                  onPressed: _atualizarPostagensPATCH,
                   child: Text("ATUALIZAR"),
                 ),
                 ElevatedButton(
